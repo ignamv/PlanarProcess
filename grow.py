@@ -9,24 +9,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 def ensure_multipolygon(polygons):
+    '''Use in functions which return either Polygon or MultiPolygon'''
     if isinstance(polygons, shapely.geometry.Polygon):
         return shapely.geometry.MultiPolygon([polygons])
     else:
         return polygons
 
 def ensure_multilinestring(lines):
+    '''Use in functions which return either LineString or MultiLineString'''
     if isinstance(lines, shapely.geometry.LineString):
         return shapely.geometry.MultiLineString([lines])
     else:
         return lines
 
 def ensure_list(item_or_list):
+    '''If not a list, pack inside a list.'''
     if isinstance(item_or_list, list):
         return item_or_list
     else:
         return [item_or_list]
 
 def plot_geometryref(geometryref, axes=None, **kwargs):
+    '''Plot geometry referenced by geometryref'''
     if axes is None:
         axes = pyplot.gca()
     polygons = ensure_multipolygon(geometryref.geometry)
@@ -37,10 +41,12 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
     axes.autoscale()
 
 class GeometryReference(object):
+    '''Pointer to shapely geometry'''
     def __init__(self, geometry):
         self.geometry = geometry
 
 def ellipse(x, y, width, height, theta0, theta1, nvertices):
+    '''List of vertices for ellipse section with semi-axes weight,height'''
     return [(x + width * numpy.cos(theta),
              y + height * numpy.sin(theta))
              for theta in numpy.linspace(theta0, theta1, nvertices)]
@@ -51,6 +57,17 @@ solids = []
 
 def grow(height, mask, base=None, consuming=None, outdiffusion=0., 
         etching=False, outdiffusion_vertices=16, y_offset=0.):
+    '''Deposit height of material on regions specified by mask.
+
+    base is one or several GeometryReference, over which material is
+    deposited. By default, deposit over all solids.
+    consuming is one or several GeometryReference, which material can
+    grow into. By default, only grow into air.
+    outdiffusion is the width of the rounded border, interpolated with 
+    outdiffusion_vertices vertices.
+    y_offset shifts in the y axis, enabling partially buried growth (for
+    example oxidation consuming silicon) and floating structures.
+    '''
     global air, solids
     if base is None:
         base = solids
@@ -94,6 +111,8 @@ def grow(height, mask, base=None, consuming=None, outdiffusion=0.,
                  large_y = 20
                  for x, y in top:
                      if y_offset == 0.:
+                         # Outdiffusion is a corner and a pillar to the 
+                         # base
                          polygons.append(shapely.geometry.Polygon(
                              ellipse(x, y - height,
                                  outdiffusion, height,
@@ -102,6 +121,7 @@ def grow(height, mask, base=None, consuming=None, outdiffusion=0.,
                              (x + outdiffusion, y - updown * large_y)]
                          ))
                      else:
+                         # Outdiffusion is a half ellipse
                          polygons.append(shapely.geometry.Polygon(
                              ellipse(x, y - height / 2,
                                  outdiffusion, height / 2,
@@ -119,6 +139,12 @@ def grow(height, mask, base=None, consuming=None, outdiffusion=0.,
     return ret
 
 def etch(depth, mask, consuming=None, **kwargs):
+    '''Etch depth on regions specified by mask.
+
+    consuming is one or several GeometryReference, which may be etched.
+    By default, etch any solid.
+    Additional kwargs are explained in grow() documentation.
+    '''
     if consuming is None:
         consuming = solids
     hole = grow(-depth, mask, base=air, consuming=consuming, etching=True,
@@ -126,6 +152,13 @@ def etch(depth, mask, consuming=None, **kwargs):
     air.geometry = air.geometry.union(hole.geometry)
 
 def implant(depth, mask, target=None, source=None, buried=0., **kwargs):
+    '''Implant to depth where specified by mask.
+
+    target is one or several GeometryReference, which may be implanted.
+    By default, implant any solid.
+    buried specifies the depth of the top edge of the implant (0 by default).
+    Additional kwargs are explained in grow() documentation.
+    '''
     if target is None:
         target = solids
     if source is None:
