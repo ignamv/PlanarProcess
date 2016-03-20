@@ -56,10 +56,12 @@ class Wafer(object):
         logger.debug('Growing %f on %s, consuming %s, mask %s, interface %s', 
                 height, base_union, consuming_union, mask, whole_interface)
         polygons = []
-        for segment in mask:
+        for segment in multilinestring_to_segments(mask):
              interface = ensure_multilinestring(whole_interface.intersection(
-                     shapely.geometry.box(segment[0], 0, segment[1],
-                         self.air.geometry.bounds[3])))
+                 shapely.geometry.box(segment[0], 0, segment[1],
+                     self.air.geometry.bounds[3])))
+             if isinstance(interface, shapely.geometry.Point):
+                 continue
              for linestring in interface:
                  if not isinstance(linestring, shapely.geometry.LineString):
                      # Don't want Points and other strange bits of the 

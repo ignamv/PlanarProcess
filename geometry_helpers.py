@@ -35,6 +35,10 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
         axes.update_datalim(zip(polygon.bounds[::2], polygon.bounds[1::2]))
     axes.autoscale()
 
+def multilinestring_to_segments(multilinestring):
+    return [[point[1] for point in segment.coords] 
+            for segment in ensure_multilinestring(multilinestring)]
+
 class GeometryReference(object):
     '''Pointer to shapely geometry'''
     def __init__(self, geometry):
