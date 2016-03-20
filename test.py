@@ -1,4 +1,4 @@
-from grow import *
+from planarprocess import *
 
 wafer = Wafer(1., 3., -2, 2)
 nplus = wafer.implant(.3, [(0,2)], outdiffusion=.1)
