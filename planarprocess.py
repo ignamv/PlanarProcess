@@ -139,6 +139,19 @@ class Wafer(object):
         self.wells.append(ret)
         return ret
 
+    def planarize(self):
+        '''Etch down to the lowest point of the wafer surface'''
+        base_union = shapely.ops.cascaded_union([s.geometry 
+            for s in self.solids])
+        whole_interface = base_union.intersection(self.air.geometry)
+        min_y = whole_interface.bounds[1]
+        old_bounds = self.air.geometry.bounds
+        new_air = shapely.geometry.box(old_bounds[0], min_y,
+                old_bounds[2], old_bounds[3])
+        self.air.geometry = self.air.geometry.union(new_air)
+        for s in self.solids:
+            s.geometry = s.geometry.difference(new_air)
+
     def blank_mask(self):
         return shapely.geometry.LineString([
             (0, self.air.geometry.bounds[0]),

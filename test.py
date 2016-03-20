@@ -38,6 +38,7 @@ contact = wafer.grow(-mld_thickness*1.1, ct, consuming=[mld, gox], base=wafer.ai
 m1 = gds.layer('Metal-1')
 metal1 = wafer.grow(1., m1, outdiffusion=.1, label='Metal-1')
 ild = wafer.grow(2., wafer.blank_mask(), outdiffusion=.1)
+wafer.planarize()
 
 custom_style[fox] = dict(fill=True, color=(.4,.4,.4))
 custom_style[gox] = dict(fill=True, color='r')
