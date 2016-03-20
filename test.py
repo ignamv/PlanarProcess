@@ -9,15 +9,20 @@ gds = GdsCut('mypmos.gds', [(0,xmin), (0, xmax)], 'gdsmap.map')
 'N-Select', 'Transistor-Poly', 'Via1']
 
 wafer = Wafer(4., 12., xmin, xmax)
+
+# N-Well
 nw = gds.layer('N-Well')
 wafer.implant(3., nw, outdiffusion=5., label='N-Well')
+
+# Field and gate oxides
 de = gds.layer('P-Active-Well')
 # TODO: channel stop under field oxide
 fox = wafer.grow(.5, wafer.blank_mask().difference(de),
         y_offset=-.2, outdiffusion=.1)
-
 gox = wafer.grow(.05, de, outdiffusion=.05, base=wafer.wells, 
         label='Gate oxide')
+
+# Gate poly and N+/P+ implants
 gp = gds.layer('Transistor-Poly')
 poly = wafer.grow(.25, gp, outdiffusion=.25, label='Gate poly')
 np = gds.layer('N-Select').intersection(
@@ -29,14 +34,17 @@ pp = gds.layer('P-Select').intersection(
 pplus = wafer.implant(.1, pp, outdiffusion=.1, target=wafer.wells, source=gox,
         label='P+')
 
+# Multi-level dielectric and contacts
 mld_thickness = .5
 mld = wafer.grow(mld_thickness, wafer.blank_mask(), outdiffusion=.1)
 ct = gds.layer('Active-Cut')
 contact = wafer.grow(-mld_thickness*1.1, ct, consuming=[mld, gox], base=wafer.air,
         outdiffusion=.05, outdiffusion_vertices=3)
+
+# Metals and vias
 m1 = gds.layer('Metal-1')
-metal1 = wafer.grow(1., m1, outdiffusion=.1, label='Metal-1')
-ild_thickness = 2.
+metal1 = wafer.grow(.6, m1, outdiffusion=.1, label='Metal-1')
+ild_thickness = 1.2
 ild1 = wafer.grow(ild_thickness, wafer.blank_mask(), outdiffusion=.1)
 wafer.planarize()
 v1 = gds.layer('Via1')
@@ -45,19 +53,19 @@ via1 = wafer.grow(-ild_thickness*1.1, v1, consuming=[ild1], base=wafer.air,
 m2 = gds.layer('Metal-2')
 metal2 = wafer.grow(1., m2, outdiffusion=.1, label='Metal-2')
 
-custom_style = {
-    fox: dict(color=(.4,.4,.4)),
-    gox: dict(color='r'),
-    poly: dict(color='m'),
-    mld: dict(color=(.2,.2,.2)),
-    ild1: dict(color=(.3,.3,.3)),
-    contact: dict(color=(.5,.5,.5)),
-    via1: dict(color=(.5,.5,.5)),
-    metal1: dict(color=(.7,.7,.7)),
-    metal2: dict(color=(.8,.8,.8)),
-}
-for style in custom_style.values():
-    style['fill'] = True
+# Presentation
+custom_style = {s: {} for s in wafer.solids}
+for solid, color in {
+        fox: '.4', gox: 'r', poly: 'g', mld: 'k',
+        ild1: '.3', contact: '.5', via1: '.5',
+        metal1: '.7', metal2: '.8'}.items():
+    custom_style[solid].update(dict(facecolor=color, edgecolor='k'))
+
+for solid in wafer.solids:
+    if solid not in wafer.wells:
+        custom_style[solid].update(dict(hatch=None, fill=True))
+        
+
 base_hatches = r'\/' # r'/\|-+xoO.*'
 hatches = cycle(list(base_hatches) + [h1+h2 for h1 in base_hatches 
         for h2 in base_hatches])
@@ -67,7 +75,7 @@ plot_geometryref(wafer.air, hatch='.', fill=False, linewidth=0, color=(.9,.9,.9)
 zorder = -99
 for solid in wafer.solids:
     style = dict(hatch=next(hatches), fill=False,
-            color=next(colors), zorder=zorder)
+            edgecolor=next(colors), zorder=zorder)
     zorder += 1
     style.update(custom_style.get(solid, {}))
     plot_geometryref(solid, **style)
