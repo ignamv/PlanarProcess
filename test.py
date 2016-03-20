@@ -37,15 +37,23 @@ contact = wafer.grow(-mld_thickness*1.1, ct, consuming=[mld, gox], base=wafer.ai
         outdiffusion=.05, outdiffusion_vertices=3)
 m1 = gds.layer('Metal-1')
 metal1 = wafer.grow(1., m1, outdiffusion=.1, label='Metal-1')
-ild = wafer.grow(2., wafer.blank_mask(), outdiffusion=.1)
+ild_thickness = 2.
+ild1 = wafer.grow(ild_thickness, wafer.blank_mask(), outdiffusion=.1)
 wafer.planarize()
+v1 = gds.layer('Via1')
+via1 = wafer.grow(-ild_thickness*1.1, v1, consuming=[ild1], base=wafer.air,
+        outdiffusion=.05, outdiffusion_vertices=3)
+m2 = gds.layer('Metal-2')
+metal2 = wafer.grow(1., m2, outdiffusion=.1, label='Metal-2')
 
 custom_style[fox] = dict(fill=True, color=(.4,.4,.4))
 custom_style[gox] = dict(fill=True, color='r')
 custom_style[mld] = dict(fill=True, color=(.2,.2,.2))
-custom_style[ild] = dict(fill=True, color=(.3,.3,.3))
+custom_style[ild1] = dict(fill=True, color=(.3,.3,.3))
 custom_style[contact] = dict(fill=True, color=(.5,.5,.5))
+custom_style[via1] = dict(fill=True, color=(.5,.5,.5))
 custom_style[metal1] = dict(fill=True, color=(.7,.7,.7))
+custom_style[metal2] = dict(fill=True, color=(.8,.8,.8))
 base_hatches = r'/\|-+xoO.*'
 base_hatches = r'\/'
 hatches = cycle(list(base_hatches) + [h1+h2 for h1 in base_hatches 
