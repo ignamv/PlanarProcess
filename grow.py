@@ -39,18 +39,6 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
 def circle(center, radius):
     return shapely.geometry.Point(center).buffer(radius)
 
-def pretty():
-    sun = circle([0, 0], 1)
-    nstars = 6
-    for ii in range(nstars):
-        angle = 2 * numpy.pi * ii / nstars
-        star = circle([numpy.cos(angle), numpy.sin(angle)], .2)
-        sun = sun.difference(star)
-    plot_geometryref(sun, fill=False, hatch='//')
-    pyplot.xlim((-2,2))
-    pyplot.ylim((-2,2))
-    pyplot.show()
-
 class GeometryReference(object):
     def __init__(self, geometry):
         self.geometry = geometry
