@@ -39,13 +39,15 @@ class Wafer(object):
             # Partially buried, return union of implant and growth
             base_copy = [b for b in base]
             bottom = self.grow(y_offset, mask, base=consuming,
-                    consuming=base, outdiffusion=outdiffusion, etching=etching,
+                    consuming=base, outdiffusion=outdiffusion, etching=True,
                     outdiffusion_vertices=outdiffusion_vertices)
             top = self.grow(height + y_offset, mask, base=base_copy + [bottom],
                     consuming=consuming, outdiffusion=outdiffusion,
-                    etching=etching, 
+                    etching=True, 
                     outdiffusion_vertices=outdiffusion_vertices)
-            return GeometryReference(top.geometry.union(bottom.geometry))
+            ret = GeometryReference(top.geometry.union(bottom.geometry))
+            self.solids.append(ret)
+            return ret
         base_union = shapely.ops.cascaded_union([b.geometry for b in base])
         consuming_union = shapely.ops.cascaded_union(
                 [c.geometry for c in consuming])
