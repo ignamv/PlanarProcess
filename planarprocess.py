@@ -9,10 +9,11 @@ logger = logging.getLogger(__name__)
 class Wafer(object):
     def __init__(self, substrate_height, maximum_y, minimum_x, maximum_x):
         self.air = GeometryReference(shapely.geometry.box(minimum_x,
-            substrate_height, maximum_y, maximum_x))
+            substrate_height, maximum_x, maximum_y))
         self.substrate = GeometryReference(shapely.geometry.box(minimum_x, 0, 
             maximum_x, substrate_height))
         self.solids = [self.substrate]
+        self.wells = [self.substrate]
 
     def grow(self, height, mask, base=None, consuming=None, outdiffusion=0., 
             etching=False, outdiffusion_vertices=16, y_offset=0.):
@@ -129,5 +130,12 @@ class Wafer(object):
             target = self.solids
         if source is None:
             source = self.air
-        return self.grow(-depth, mask, base=source, consuming=target,
+        ret = self.grow(-depth, mask, base=source, consuming=target,
                 y_offset=-buried, **kwargs)
+        self.wells.append(ret)
+        return ret
+
+    def blank_mask(self):
+        return shapely.geometry.LineString([
+            (0, self.air.geometry.bounds[0]),
+            (0, self.air.geometry.bounds[2])])
