@@ -1,4 +1,8 @@
-import gdsCAD
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    # Ignore dxfgrabber warning
+    import gdsCAD
 import shapely
 import shapely.affinity
 import re
