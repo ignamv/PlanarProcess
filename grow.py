@@ -64,7 +64,7 @@ maxy = 4
 air = GeometryReference(shapely.geometry.box(-2, 1, 4, maxy))
 solids = []
 
-def grow(height, segments, base=None, consuming=None, outdiffusion=0., 
+def grow(height, mask, base=None, consuming=None, outdiffusion=0., 
         etching=False, outdiffusion_vertices=16, y_offset=0.):
     global air, solids
     if base is None:
@@ -76,10 +76,10 @@ def grow(height, segments, base=None, consuming=None, outdiffusion=0.,
     if y_offset != 0 and numpy.sign(y_offset) != numpy.sign(y_offset + height):
         # Partially buried, return union of implant and growth
         base_copy = [b for b in base]
-        bottom = grow(y_offset, segments, base=consuming,
+        bottom = grow(y_offset, mask, base=consuming,
                 consuming=base, outdiffusion=outdiffusion, etching=etching,
                 outdiffusion_vertices=outdiffusion_vertices)
-        top = grow(height + y_offset, segments, base=base_copy + [bottom],
+        top = grow(height + y_offset, mask, base=base_copy + [bottom],
                 consuming=consuming, outdiffusion=outdiffusion,
                 etching=etching, outdiffusion_vertices=outdiffusion_vertices)
         return GeometryReference(top.geometry.union(bottom.geometry))
@@ -87,10 +87,10 @@ def grow(height, segments, base=None, consuming=None, outdiffusion=0.,
     consuming_union = shapely.ops.cascaded_union([c.geometry for c in consuming])
     whole_interface = base_union.intersection(consuming_union)
     buried = numpy.sign(height) != numpy.sign(y_offset)
-    logger.debug('Growing %f on %s, consuming %s, segments %s, interface %s', 
-            height, base_union, consuming_union, segments, whole_interface)
+    logger.debug('Growing %f on %s, consuming %s, mask %s, interface %s', 
+            height, base_union, consuming_union, mask, whole_interface)
     polygons = []
-    for segment in segments:
+    for segment in mask:
          interface = ensure_multilinestring(whole_interface.intersection(
                  shapely.geometry.box(segment[0], 0, segment[1], maxy)))
          for linestring in interface:
@@ -133,19 +133,19 @@ def grow(height, segments, base=None, consuming=None, outdiffusion=0.,
         solids.append(ret)
     return ret
 
-def etch(depth, segments, consuming=None, **kwargs):
+def etch(depth, mask, consuming=None, **kwargs):
     if consuming is None:
         consuming = solids
-    hole = grow(-depth, segments, base=air, consuming=consuming, etching=True,
+    hole = grow(-depth, mask, base=air, consuming=consuming, etching=True,
             **kwargs)
     air.geometry = air.geometry.union(hole.geometry)
 
-def implant(depth, segments, target=None, source=None, buried=0., **kwargs):
+def implant(depth, mask, target=None, source=None, buried=0., **kwargs):
     if target is None:
         target = solids
     if source is None:
         source = air
-    return grow(-depth, segments, base=source, consuming=target,
+    return grow(-depth, mask, base=source, consuming=target,
             y_offset=-buried, **kwargs)
 
 #logger.setLevel(logging.DEBUG)
@@ -158,10 +158,10 @@ m1 = grow(.2, [(-1.5, 0.5)], outdiffusion=.1)
 m2 = grow(.3, [(-1., 1.)], outdiffusion=.1)
 etch(1., [(-.25, .15)], outdiffusion=.2, outdiffusion_vertices=32)
 fox = grow(.2, [(-.5, 1.5)], outdiffusion=.1, y_offset=-.05)
-#fox_segments = [(-.5, 1.5)]
-#fox = implant(.05, fox_segments, outdiffusion=.1)
+#fox_mask = [(-.5, 1.5)]
+#fox = implant(.05, fox_mask, outdiffusion=.1)
 #fox.geometry = fox.geometry.union(
-        #grow(.1, fox_segments, outdiffusion=.1).geometry)
+        #grow(.1, fox_mask, outdiffusion=.1).geometry)
 
 plot_geometryref(nburied, hatch='\\\\', fill=False, color='c')
 plot_geometryref(nplus, hatch='\\', fill=False, color='r')
