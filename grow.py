@@ -68,7 +68,6 @@ def grow(height, mask, base=None, consuming=None, outdiffusion=0.,
     y_offset shifts in the y axis, enabling partially buried growth (for
     example oxidation consuming silicon) and floating structures.
     '''
-    global air, solids
     if base is None:
         base = solids
     if consuming is None:
