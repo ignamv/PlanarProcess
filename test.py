@@ -8,7 +8,6 @@ gds = GdsCut('mypmos.gds', [(0,xmin), (0, xmax)], 'gdsmap.map')
 ['P-Active-Well', 'Active-Cut', 'N-Well', 'Metal-2', 'Metal-1', 'P-Select',
 'N-Select', 'Transistor-Poly', 'Via1']
 
-custom_style = {}
 wafer = Wafer(4., 12., xmin, xmax)
 nw = gds.layer('N-Well')
 wafer.implant(3., nw, outdiffusion=5., label='N-Well')
@@ -20,7 +19,7 @@ fox = wafer.grow(.5, wafer.blank_mask().difference(de),
 gox = wafer.grow(.05, de, outdiffusion=.05, base=wafer.wells, 
         label='Gate oxide')
 gp = gds.layer('Transistor-Poly')
-wafer.grow(.25, gp, outdiffusion=.25, label='Gate poly')
+poly = wafer.grow(.25, gp, outdiffusion=.25, label='Gate poly')
 np = gds.layer('N-Select').intersection(
         gds.layer('P-Active-Well')).difference(gp)
 nplus = wafer.implant(.1, np, outdiffusion=.1, target=wafer.wells, source=gox,
@@ -46,16 +45,20 @@ via1 = wafer.grow(-ild_thickness*1.1, v1, consuming=[ild1], base=wafer.air,
 m2 = gds.layer('Metal-2')
 metal2 = wafer.grow(1., m2, outdiffusion=.1, label='Metal-2')
 
-custom_style[fox] = dict(fill=True, color=(.4,.4,.4))
-custom_style[gox] = dict(fill=True, color='r')
-custom_style[mld] = dict(fill=True, color=(.2,.2,.2))
-custom_style[ild1] = dict(fill=True, color=(.3,.3,.3))
-custom_style[contact] = dict(fill=True, color=(.5,.5,.5))
-custom_style[via1] = dict(fill=True, color=(.5,.5,.5))
-custom_style[metal1] = dict(fill=True, color=(.7,.7,.7))
-custom_style[metal2] = dict(fill=True, color=(.8,.8,.8))
-base_hatches = r'/\|-+xoO.*'
-base_hatches = r'\/'
+custom_style = {
+    fox: dict(color=(.4,.4,.4)),
+    gox: dict(color='r'),
+    poly: dict(color='m'),
+    mld: dict(color=(.2,.2,.2)),
+    ild1: dict(color=(.3,.3,.3)),
+    contact: dict(color=(.5,.5,.5)),
+    via1: dict(color=(.5,.5,.5)),
+    metal1: dict(color=(.7,.7,.7)),
+    metal2: dict(color=(.8,.8,.8)),
+}
+for style in custom_style.values():
+    style['fill'] = True
+base_hatches = r'\/' # r'/\|-+xoO.*'
 hatches = cycle(list(base_hatches) + [h1+h2 for h1 in base_hatches 
         for h2 in base_hatches])
 colors = cycle('krgbcmy')
