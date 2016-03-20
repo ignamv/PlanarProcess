@@ -16,7 +16,7 @@ class Wafer(object):
         self.wells = [self.substrate]
 
     def grow(self, height, mask, base=None, consuming=None, outdiffusion=0., 
-            etching=False, outdiffusion_vertices=16, y_offset=0.):
+            etching=False, outdiffusion_vertices=16, y_offset=0., label=None):
         '''Deposit height of material on regions specified by mask.
 
         base is one or several GeometryReference, over which material is
@@ -102,7 +102,7 @@ class Wafer(object):
             c.geometry = c.geometry.difference(ret)
         for b in base:
             b.geometry = b.geometry.difference(ret)
-        ret = GeometryReference(ret)
+        ret = GeometryReference(ret, label)
         if not etching:
             self.solids.append(ret)
         return ret

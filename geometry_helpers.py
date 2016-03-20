@@ -29,10 +29,14 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
     if axes is None:
         axes = pyplot.gca()
     polygons = ensure_multipolygon(geometryref.geometry)
+    if geometryref.label is not None and 'label' not in kwargs:
+        kwargs['label'] = geometryref.label
     for polygon in polygons:
         xy = numpy.column_stack( polygon.exterior.xy)
         axes.add_patch(matplotlib.patches.Polygon(xy, **kwargs))
         axes.update_datalim(zip(polygon.bounds[::2], polygon.bounds[1::2]))
+        # Only first polygon needs a legend entry
+        kwargs.pop('label', None)
     axes.autoscale()
 
 def multilinestring_to_segments(multilinestring):
@@ -41,8 +45,9 @@ def multilinestring_to_segments(multilinestring):
 
 class GeometryReference(object):
     '''Pointer to shapely geometry'''
-    def __init__(self, geometry):
+    def __init__(self, geometry, label=None):
         self.geometry = geometry
+        self.label = label
 
 def ellipse(x, y, width, height, theta0, theta1, nvertices):
     '''List of vertices for ellipse section with semi-axes weight,height'''
