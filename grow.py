@@ -36,9 +36,6 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
         axes.update_datalim(zip(polygon.bounds[::2], polygon.bounds[1::2]))
     axes.autoscale()
 
-def circle(center, radius):
-    return shapely.geometry.Point(center).buffer(radius)
-
 class GeometryReference(object):
     def __init__(self, geometry):
         self.geometry = geometry
