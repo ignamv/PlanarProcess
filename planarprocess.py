@@ -154,5 +154,6 @@ class Wafer(object):
 
     def blank_mask(self):
         return shapely.geometry.LineString([
-            (0, self.air.geometry.bounds[0]),
-            (0, self.air.geometry.bounds[2])])
+            (self.air.geometry.bounds[0], 0),
+            (self.air.geometry.bounds[2], 0)])
+

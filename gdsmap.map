@@ -1,0 +1,50 @@
+# Written on dom abr 03, 2016 21:16:46 #
+# by Electric VLSI Design System, version 9.06 #
+
+# GDS Map for technology 'mocmos'
+# Layer Name 		 Layer Purpose 	 Layer Stream Number 	 Datatype Stream Number
+
+Poly-Cut		drawing	25	0
+Active-Cut		drawing	25	0
+Pad-Frame		drawing	26	0
+Poly-Cap		drawing	28	0
+Silicide-Block		drawing	29	0
+Via3		drawing	30	0
+Metal-4		drawing	31	0
+Metal-4		pin	63	0
+Metal-4		text	63	0
+Via4		drawing	32	0
+Metal-5		drawing	33	0
+Metal-5		pin	64	0
+Metal-5		text	64	0
+Hi-Res		drawing	34	0
+Via5		drawing	36	0
+Metal-6		drawing	37	0
+Metal-6		pin	68	0
+Metal-6		text	68	0
+P-Well		drawing	41	0
+N-Well		drawing	42	0
+P-Active		drawing	43	0
+N-Active		drawing	43	0
+P-Active-Well		drawing	43	0
+P-Select		drawing	44	0
+N-Select		drawing	45	0
+Polysilicon-1		drawing	46	0
+Polysilicon-1		pin	77	0
+Polysilicon-1		text	77	0
+Transistor-Poly		drawing	46	0
+Metal-1		drawing	49	0
+Metal-1		pin	80	0
+Metal-1		text	80	0
+Via1		drawing	50	0
+Metal-2		drawing	51	0
+Metal-2		pin	82	0
+Metal-2		text	82	0
+Passivation		drawing	52	0
+Polysilicon-2		drawing	56	0
+P-Base		drawing	58	0
+Thick-Active		drawing	60	0
+Via2		drawing	61	0
+Metal-3		drawing	62	0
+Metal-3		pin	93	0
+Metal-3		text	93	0
