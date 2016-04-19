@@ -30,8 +30,8 @@ def load_gds_map(filename):
     '''Return number->name mapping from gds map file'''
     layers = {}
     input_file = open(filename)
-    gds_map_regex = re.compile('(?P<name>[a-zA-Z0-9\-]+)\t+'
-            '(?P<purpose>[a-zA-Z0-9]+)\t(?P<number>\d+)\t(?P<datatype>\d+)$')
+    gds_map_regex = re.compile(r'(?P<name>[a-zA-Z0-9\-]+)\s+'
+                '(?P<purpose>[a-zA-Z0-9]+)\s+(?P<number>\d+)\s+(?P<datatype>\d+)\s*$')
     for line in input_file:
         match = gds_map_regex.match(line)
         if not match:
