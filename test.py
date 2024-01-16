@@ -55,10 +55,10 @@ metal2 = wafer.grow(1., m2, outdiffusion=.1, label='Metal-2')
 
 # Presentation
 custom_style = {s: {} for s in wafer.solids}
-for solid, color in {
+for solid, color in list({
         fox: '.4', gox: 'r', poly: 'g', mld: 'k',
         ild1: '.3', contact: '.5', via1: '.5',
-        metal1: '.7', metal2: '.8'}.items():
+        metal1: '.7', metal2: '.8'}.items()):
     custom_style[solid].update(dict(facecolor=color, edgecolor='k'))
 
 for solid in wafer.solids:

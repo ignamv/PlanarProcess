@@ -15,15 +15,15 @@ def gds_cross_section(gds_file, cut_segment, layer_map=None):
     layer_map: optional filename for GDS map file. If present, the returned
     dictionary's keys will be layer names instead of numbers.'''
     cut_segment = geometry.LineString(cut_segment)
-    cell = gdsCAD.core.GdsImport(gds_file).values()[0]
+    cell = list(gdsCAD.core.GdsImport(gds_file).values())[0]
     layers = {layer: polygons_to_cross_section(polygons, cut_segment)
-            for layer, polygons in cell_to_MultiPolygon(cell).items()}
+            for layer, polygons in list(cell_to_MultiPolygon(cell).items())}
     if layer_map is None:
         self.layers = layers
     else:
         layer_map = load_gds_map(layer_map)
         layers = {layer_map[layer]: geometry 
-                for layer, geometry in layers.items()}
+                for layer, geometry in list(layers.items())}
     return layers
 
 def load_gds_map(filename):

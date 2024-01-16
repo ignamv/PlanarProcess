@@ -28,10 +28,10 @@ def plot_geometry(geometry, axes=None, **kwargs):
     if axes is None:
         axes = pyplot.gca()
     polygons = ensure_multipolygon(geometry)
-    for polygon in polygons:
+    for polygon in polygons.geoms:
         xy = numpy.column_stack( polygon.exterior.xy)
         axes.add_patch(matplotlib.patches.Polygon(xy, **kwargs))
-        axes.update_datalim(zip(polygon.bounds[::2], polygon.bounds[1::2]))
+        axes.update_datalim(list(zip(polygon.bounds[::2], polygon.bounds[1::2])))
         # Only first polygon needs a legend entry
         kwargs.pop('label', None)
     axes.autoscale()
@@ -49,7 +49,7 @@ def plot_geometryref(geometryref, axes=None, **kwargs):
 
 def multilinestring_to_segments(multilinestring):
     return [[point[0] for point in segment.coords] 
-            for segment in ensure_multilinestring(multilinestring)]
+            for segment in ensure_multilinestring(multilinestring).geoms]
 
 class GeometryReference(object):
     '''Pointer to shapely geometry'''
@@ -71,8 +71,8 @@ def polygons_to_cross_section(polygons, cut_segment):
                     cut_segment.intersection(side))
             if intersection > cuts[0] and intersection < cuts[-1] \
                     and intersection not in cuts:
-                index = (ii for ii, element in enumerate(cuts) 
-                        if element > intersection).next()
+                index = next((ii for ii, element in enumerate(cuts) 
+                        if element > intersection))
                 cuts.insert(index, intersection)
     present = [False] * (len(cuts) - 1)
     for polygon in polygons:
