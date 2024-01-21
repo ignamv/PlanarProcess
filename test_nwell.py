@@ -11,7 +11,7 @@ wafer = Wafer(1., 5., 0, xmax - xmin)
 
 # N-Well
 nw = layers['N-Well']
-print nw
+print(nw)
 wafer.implant(.7, nw, outdiffusion=0., label='N-Well')
 present(wafer)
 pyplot.legend()

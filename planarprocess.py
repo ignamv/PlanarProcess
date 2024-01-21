@@ -48,8 +48,8 @@ class Wafer(object):
             ret = GeometryReference(top.geometry.union(bottom.geometry))
             self.solids.append(ret)
             return ret
-        base_union = shapely.ops.cascaded_union([b.geometry for b in base])
-        consuming_union = shapely.ops.cascaded_union(
+        base_union = shapely.ops.unary_union([b.geometry for b in base])
+        consuming_union = shapely.ops.unary_union(
                 [c.geometry for c in consuming])
         whole_interface = base_union.intersection(consuming_union)
         buried = numpy.sign(height) != numpy.sign(y_offset)
@@ -62,6 +62,8 @@ class Wafer(object):
                      self.air.geometry.bounds[3])))
              if isinstance(interface, shapely.geometry.Point):
                  continue
+             if isinstance(interface, shapely.geometry.MultiLineString):
+                 interface = interface.geoms;
              for linestring in interface:
                  if not isinstance(linestring, shapely.geometry.LineString):
                      # Don't want Points and other strange bits of the 
@@ -96,7 +98,7 @@ class Wafer(object):
                                      0, 2 * numpy.pi, outdiffusion_vertices)))
 
          # Only consume from specified geometry
-        ret = shapely.ops.cascaded_union(polygons).intersection(
+        ret = shapely.ops.unary_union(polygons).intersection(
                 consuming_union)
         for c in consuming:
             c.geometry = c.geometry.difference(ret)
@@ -141,7 +143,7 @@ class Wafer(object):
 
     def planarize(self):
         '''Etch down to the lowest point of the wafer surface'''
-        base_union = shapely.ops.cascaded_union([s.geometry 
+        base_union = shapely.ops.unary_union([s.geometry 
             for s in self.solids])
         whole_interface = base_union.intersection(self.air.geometry)
         min_y = whole_interface.bounds[1]
